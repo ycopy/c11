@@ -94,11 +94,17 @@ public:
 
 class user_event_handler {
 public:
+	long call_count;
+	user_event_handler():call_count(0)
+	{}
+
 	void foo_int(int arg) {
 		printf("cfoo::foo(), arg: %d", arg);
+		call_count++;
 	}
 	void foo_int_int(int a, int b) {
 		printf("cfoo::foo(), arg: %d", a,b);
+		call_count++;
 	}
 };
 
@@ -116,17 +122,22 @@ int main() {
 		(void)b;
 	};
 
-	user_et->bind(1, lambda);
-
+	//user_et->bind(1, lambda);
 	user_et->bind<event_handler_int_t>(1, [&user_evh](int a) {
 		user_evh->foo_int(a);
 	});
-	
+
 	user_et->invoke_int(10);
+	user_et->invoke_int(10);
+	assert(user_evh->call_count == 2);
 
 	user_et->bind(2,lambda2);
 	user_et->invoke_int_int(1,2);
-	
+	assert(user_evh->call_count == 3);
+
+	user_et->invoke_int_int(1, 2);
+	assert(user_evh->call_count == 4);
+
 	delete user_et;
 	delete user_evh;
 }
