@@ -55,6 +55,14 @@ public:
 		m_evt_map.insert({ id, handler });
 	}
 
+	template<class func_t, class _Lambda
+		, class = typename std::enable_if<std::is_convertible<_Lambda, func_t>::value>::type>
+	void bind(int const& id, _Lambda&& lambda) {
+		typedef std::remove_reference<_Lambda>::type lambda_t;
+		event_handler_base* handler = make_event_handler<func_t>(std::forward<lambda_t>(lambda));
+		m_evt_map.insert({ id, handler });
+	}
+
 	template<class _Callable, class... _Args>
 	void invoke(int id, _Args&&... _args) {
 		typename event_map_t::iterator it = m_evt_map.find(id);
@@ -66,22 +74,31 @@ public:
 	}
 };
 
-typedef std::function<void(int)> event_handler_t;
+typedef std::function<void(int)> event_handler_int_t;
+typedef std::function<void(int,int)> event_handler_int_int_t;
+
 class user_event_trigger :
 	public event_trigger
 {
 	//event_handler_t _eht_v;
 	//typedef decltype(_eht_v) event_handler_t
 public:
-	void invoke_foo(int i) {
-		event_trigger::invoke<event_handler_t>(1,i);
+	void invoke_int(int i) {
+		event_trigger::invoke<event_handler_int_t>(1,i);
+	}
+
+	void invoke_int_int(int a, int b) {
+		event_trigger::invoke<event_handler_int_int_t>(2, a, b);
 	}
 };
 
 class user_event_handler {
 public:
-	void foo(int arg) {
+	void foo_int(int arg) {
 		printf("cfoo::foo(), arg: %d", arg);
+	}
+	void foo_int_int(int a, int b) {
+		printf("cfoo::foo(), arg: %d", a,b);
 	}
 };
 
@@ -89,19 +106,27 @@ int main() {
 	user_event_trigger* user_et = new user_event_trigger();
 	user_event_handler* user_evh = new user_event_handler();
 
-	event_handler_t lambda;
+	event_handler_int_t lambda;
 	lambda = [&user_evh](int arg) -> void {
-		user_evh->foo(arg);
+		user_evh->foo_int(arg);
+	};
+
+	event_handler_int_int_t lambda2 = [&user_evh](int a, int b) -> void {
+		user_evh->foo_int_int(a,b);
+		(void)b;
 	};
 
 	user_et->bind(1, lambda);
 
-	//user_et->bind(1, [&user_evh](int a) {
-	//	user_evh->foo(a);
-	//});
+	user_et->bind<event_handler_int_t>(1, [&user_evh](int a) {
+		user_evh->foo_int(a);
+	});
 	
-	user_et->invoke_foo(10);
+	user_et->invoke_int(10);
 
+	user_et->bind(2,lambda2);
+	user_et->invoke_int_int(1,2);
+	
 	delete user_et;
 	delete user_evh;
 }
