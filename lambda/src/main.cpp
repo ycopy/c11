@@ -55,11 +55,17 @@ public:
 		m_evt_map.insert({ id, handler });
 	}
 
-	template<class func_t, class _Lambda
-		, class = typename std::enable_if<std::is_convertible<_Lambda, func_t>::value>::type>
+	template<class handler_func_t, class _Lambda
+		, class = typename std::enable_if<std::is_convertible<_Lambda, handler_func_t>::value>::type>
 	void bind(int const& id, _Lambda&& lambda) {
 		typedef std::remove_reference<_Lambda>::type lambda_t;
-		event_handler_base* handler = make_event_handler<func_t>(std::forward<lambda_t>(lambda));
+		event_handler_base* handler = make_event_handler<handler_func_t>(std::forward<lambda_t>(lambda));
+		m_evt_map.insert({ id, handler });
+	}
+
+	template<class handler_func_t, class _Fx, class... _Args>
+	void bind(int const& id, _Fx&& _func, _Args&&... _args) {
+		event_handler_base* handler = make_event_handler<handler_func_t>(std::bind(std::forward<_Fx>(_func), std::forward<_Args>(_args)...));
 		m_evt_map.insert({ id, handler });
 	}
 
@@ -108,7 +114,9 @@ public:
 	}
 };
 
+
 int main() {
+
 	user_event_trigger* user_et = new user_event_trigger();
 	user_event_handler* user_evh = new user_event_handler();
 
@@ -137,6 +145,13 @@ int main() {
 
 	user_et->invoke_int_int(1, 2);
 	assert(user_evh->call_count == 4);
+
+
+	event_handler_int_t h_frombind = std::bind(&user_event_handler::foo_int, user_evh, std::placeholders::_1);
+
+	user_et->bind<event_handler_int_t>(1, &user_event_handler::foo_int, user_evh, std::placeholders::_1);
+	user_et->invoke<event_handler_int_t>(1,3);
+
 
 	delete user_et;
 	delete user_evh;
