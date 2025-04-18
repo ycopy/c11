@@ -15,7 +15,7 @@
         <mxCell id="GS8hxyTyObDqApa_BKXd-0" value="&lt;div&gt;传输层&lt;/div&gt;&lt;div&gt;TCP/QUIC&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
           <mxGeometry x="340" y="80" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="GS8hxyTyObDqApa_BKXd-2" value="&lt;div&gt;网络层&lt;/div&gt;HTTP/WEBSOCKET" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+        <mxCell id="GS8hxyTyObDqApa_BKXd-2" value="&lt;div&gt;网络层&lt;/div&gt;IP/ICMP" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
           <mxGeometry x="520" y="80" width="120" height="40" as="geometry" />
         </mxCell>
       </root>
